@@ -17,6 +17,12 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+		class UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+		class USpringArmComponent* SpringArm;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -34,7 +40,19 @@ protected:
 		class UInputMappingContext* InputMapping;
 
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
-		class UInputAction* TestAction;
+		class UInputAction* MoveAction;
 
-	void TestInput();
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* LookAction;
+
+	/* FInputActionValue to find out which button we are pressing*/
+
+	void Move(const FInputActionValue& InputValue);
+
+	void Jump();
+
+	void Look(const FInputActionValue& InputValue);	
 };
