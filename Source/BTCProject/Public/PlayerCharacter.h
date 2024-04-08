@@ -41,8 +41,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter")
 		bool CanAttack();
 
-	void Attack();
-
 	void Hit(int damage);
 
 	// Called every frame
@@ -75,6 +73,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 		class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* AttackAction;
+
 	/* FInputActionValue to find out which button we are pressing*/
 
 	void Move(const FInputActionValue& InputValue);
@@ -82,6 +83,8 @@ protected:
 	void Jump();
 
 	void Look(const FInputActionValue& InputValue);	
+
+	void Attack();
 
 private:
 

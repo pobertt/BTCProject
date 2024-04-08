@@ -41,12 +41,9 @@ bool APlayerCharacter::IsKilled()
 
 bool APlayerCharacter::CanAttack()
 {
-	return (_AttackCountingDown <= 0.0f);
-}
+	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 
-void APlayerCharacter::Attack()
-{
-
+	return (_AttackCountingDown <= 0.0f && animInst->State == EPlayerState::Locomotion);
 }
 
 void APlayerCharacter::Hit(int damage)
@@ -71,7 +68,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UPlayerCharacterAnimInstance* animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
 }
 
@@ -99,6 +96,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Jump);
 
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+
+		Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Attack);
 	}
 }
 
@@ -134,6 +133,8 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 void APlayerCharacter::Jump()
 {
 	ACharacter::Jump();
+
+	//Add jumping animation here
 }
 
 void APlayerCharacter::Look(const FInputActionValue& InputValue)
@@ -144,5 +145,16 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 	{
 		AddControllerYawInput(InputVector.X);
 		AddControllerPitchInput(InputVector.Y);
+	}
+}
+
+void APlayerCharacter::Attack()
+{
+	if (CanAttack())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed input action");
+
+		UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+		animInst->State = EPlayerState::Attack;
 	}
 }
