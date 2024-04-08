@@ -71,10 +71,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*
 	UPlayerCharacterAnimInstance* animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
-	*/
 }
 
 // Called to bind functionality to input
