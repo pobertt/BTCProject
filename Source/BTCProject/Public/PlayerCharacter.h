@@ -17,11 +17,33 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* Camera;
+	UPROPERTY(EditAnywhere, Category = "Player Params")
+		int HealthPoints = 500;
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* SpringArm;
+	UPROPERTY(EditAnywhere, Category = "Player Params")
+		float Strength = 10;
+
+	UPROPERTY(EditAnywhere, Category = "Player Params")
+		float Armour = 3;
+
+	UPROPERTY(EditAnywhere, Category = "Player Params")
+		float AttackRange = 6.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Player Params")
+		float AttackInterval = 1.2f;
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter", meta = (DisplayName = "Get HP"))
+		int GetHealthPoints();
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter")
+		bool IsKilled();
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter")
+		bool CanAttack();
+
+	void Attack();
+
+	void Hit(int damage);
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -33,6 +55,11 @@ protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	int _HealthPoints;
+	float _AttackCountingDown;
+
+	void DieProcess();
 
 	/* References to Input Mapping / Action */
 
@@ -55,4 +82,24 @@ protected:
 	void Jump();
 
 	void Look(const FInputActionValue& InputValue);	
+
+private:
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+		class UCameraComponent* _CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+		class USpringArmComponent* _SpringArmComponent;
+
+public:
+
+	FORCEINLINE USpringArmComponent* GetSpringArmComponent() const
+	{
+		return _SpringArmComponent;
+	}
+
+	FORCEINLINE UCameraComponent* GetCameraComponent() const
+	{
+		return _CameraComponent;
+	}
 };

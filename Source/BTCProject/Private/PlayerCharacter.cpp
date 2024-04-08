@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PlayerCharacterAnimInstance.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -15,17 +16,47 @@ APlayerCharacter::APlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->bUsePawnControlRotation = true;
+	_SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+	_SpringArmComponent->SetupAttachment(RootComponent);
+	_SpringArmComponent->bUsePawnControlRotation = true;
 
-	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
-	Camera->SetupAttachment(SpringArm); 
+	_CameraComponent = CreateDefaultSubobject<UCameraComponent>("Camera");
+	_CameraComponent->SetupAttachment(_SpringArmComponent);
 	//Was RootComponent for (FPS) and below was for fps cam
 	//Camera->bUsePawnControlRotation = true;
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+int APlayerCharacter::GetHealthPoints()
+{
+	return _HealthPoints;
+}
+
+bool APlayerCharacter::IsKilled()
+{
+	return (_HealthPoints <= 0.0f);
+}
+
+bool APlayerCharacter::CanAttack()
+{
+	return (_AttackCountingDown <= 0.0f);
+}
+
+void APlayerCharacter::Attack()
+{
+
+}
+
+void APlayerCharacter::Hit(int damage)
+{
+
+}
+
+void APlayerCharacter::DieProcess()
+{
+
 }
 
 // Called when the game starts or when spawned
@@ -40,6 +71,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UPlayerCharacterAnimInstance* animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
 }
 
 // Called to bind functionality to input
