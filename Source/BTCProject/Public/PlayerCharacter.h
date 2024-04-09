@@ -26,11 +26,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Player Params")
 		float Armour = 3;
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
 		float AttackRange = 6.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
 		float AttackInterval = 1.2f;
+
+	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+		bool bCanAttack = true;
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter", meta = (DisplayName = "Get HP"))
 		int GetHealthPoints();

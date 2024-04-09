@@ -150,11 +150,8 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 
 void APlayerCharacter::Attack()
 {
-	if (CanAttack())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed input action");
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed input action");
 
-		UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-		animInst->State = EPlayerState::Attack;
-	}
+	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	animInst->State = EPlayerState::Attack;
 }
