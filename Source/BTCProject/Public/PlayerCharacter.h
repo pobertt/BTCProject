@@ -35,6 +35,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
 		bool bCanAttack = true;
 
+	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+		bool bCanGrapple = true;
+
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter", meta = (DisplayName = "Get HP"))
 		int GetHealthPoints();
 

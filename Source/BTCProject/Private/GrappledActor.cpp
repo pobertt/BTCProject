@@ -9,13 +9,14 @@ AGrappledActor::AGrappledActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	_BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
-	SetRootComponent(_BoxComponent);
-
 	_MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh"));
-	_MeshComponent->SetupAttachment(_BoxComponent);
+	SetRootComponent(_MeshComponent);
 
-	_MeshComponent->ComponentTags.Add(FName("Grappleable"));
+	_BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
+	_BoxComponent->SetupAttachment(_MeshComponent);
+	
+
+	this->Tags.Add(FName("Grappleable"));
 }
 
 // Called when the game starts or when spawned
