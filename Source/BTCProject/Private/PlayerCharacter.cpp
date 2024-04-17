@@ -8,6 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/World.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "PlayerCharacterAnimInstance.h"
 
 // Sets default values
@@ -68,8 +70,39 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UE_LOG(LogTemp, Warning, TEXT("x: %f Y: %f Z: %f"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
+
 	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	// FVector Start = GetCameraComponent()->GetForwardVector();
+	// FVector End = Start * 1000.0f;
+
+	FVector Start = GetActorLocation() + FVector(0,0,50);
+	FVector End = Start + _CameraComponent->GetForwardVector() * 1000.f;
+
+	bool HitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params, FCollisionResponseParams());
+
+
+	if (HitSomething)
+	{
+		// GetWorld()->LineTrace
+		if (HitResult.GetActor()->ActorHasTag("Grappleable"))
+		{
+
+		}
+		UKismetSystemLibrary::DrawDebugLine(GetWorld(), Start, End, FColor(100, 0, 0));
+		UKismetSystemLibrary::DrawDebugSphere(GetWorld(), End, 5, 5, FLinearColor::White);
+	}
+	else
+	{
+		UKismetSystemLibrary::DrawDebugLine(GetWorld(), Start, End, FColor(100, 0, 0));
+		UKismetSystemLibrary::DrawDebugSphere(GetWorld(), End, 5, 5, FLinearColor::White);
+	}
 }
 
 // Called to bind functionality to input
@@ -151,7 +184,8 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 void APlayerCharacter::Attack()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed input action");
-
+	
 	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->State = EPlayerState::Attack;
+
 }
