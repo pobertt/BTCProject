@@ -83,15 +83,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
-
-	if (isGrappling)
-	{
-		GrappleCable->EndLocation = GetActorTransform().InverseTransformPosition(GrapplePoint);
-
-		GetCharacterMovement()->AddForce(GrapplePoint - GetActorLocation().GetSafeNormal() * 100000);
-	}
 }
 
 // Called to bind functionality to input
@@ -121,7 +115,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Attack);
 
-		Input->BindAction(GrappleAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Grapple);
+		Input->BindAction(GrappleAction, ETriggerEvent::Started, this, &APlayerCharacter::Grapple);
 		Input->BindAction(GrappleAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopGrapple);
 	}
 }
@@ -184,40 +178,33 @@ void APlayerCharacter::Attack()
 
 void APlayerCharacter::Grapple()
 {
-	/* Old 
-	FVector Start = GetCapsuleComponent()->GetComponentLocation();
-	FVector End = Start + (MaxLineDistance * _CameraComponent->GetComponentRotation());
-	DrawDebugLine(GetWorld(), Start, End, FColor::Emerald);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
 
-	FHitResult HitResult;
-	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, Start, End, 
-		FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(100.0f));
-
-	if (HasHit)
-	{
-		AGrappledActor* HitActor = Cast<AGrappledActor>(HitResult.GetActor());
-		if (HitActor != nullptr)
-		{
-			HitActor->OnActivate();
-		}
-
-	}
-	*/
-
-	FVector Start = GetCapsuleComponent()->GetComponentLocation();
+	FVector Start = (GetActorForwardVector() * 50.f) + GetCapsuleComponent()->GetComponentLocation();
 	FVector End = Start + (MaxLineDistance * UKismetMathLibrary::GetForwardVector(_CameraComponent->GetComponentRotation()));
 	DrawDebugLine(GetWorld(), Start, End, FColor::Emerald);
 
 	FHitResult HitResult;
 	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, Start, End,
-		FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(100.0f));
+		FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(1.0f), Params);
 	
-	if (HasHit)
+	if (HasHit && bCanGrapple == true)
 	{
 		isGrappling = true;
+		bCanGrapple = false;
+
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 		GrappleCable->SetVisibility(true);
 		GrapplePoint = HitResult.ImpactPoint;
+
+		if (isGrappling)
+		{
+			GrappleCable->EndLocation = GetActorTransform().InverseTransformPosition(GrapplePoint);
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::FormatAsNumber(GrappleCable->EndLocation.X));
+
+			GetCharacterMovement()->AddImpulse((GrapplePoint - GetActorLocation()).GetSafeNormal() * 10000);
+		}
 	}
 }
 
@@ -229,4 +216,5 @@ void APlayerCharacter::StopGrapple()
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 	}
 	GrappleCable->SetVisibility(false);
+	bCanGrapple = true;
 }
