@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "../../../Plugins/Runtime/CableComponent/Source/CableComponent/Classes/CableComponent.h"
+#include "GrappledActor.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -82,6 +84,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 		class UInputAction* AttackAction;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* GrappleAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grappling", meta = (AllowPrivateAccess = "true"))
+		class UCableComponent* GrappleCable;
+
 	/* FInputActionValue to find out which button we are pressing*/
 
 	void Move(const FInputActionValue& InputValue);
@@ -92,6 +100,10 @@ protected:
 
 	void Attack();
 
+	void Grapple();
+
+	void StopGrapple();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -99,6 +111,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* _SpringArmComponent;
+
+	float MaxLineDistance = 1600.0f;
+
+	bool isGrappling = false;
+
+	FVector GrapplePoint;
 
 public:
 
@@ -111,4 +129,5 @@ public:
 	{
 		return _CameraComponent;
 	}
+
 };

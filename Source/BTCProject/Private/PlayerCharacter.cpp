@@ -9,14 +9,20 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
+#include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "PlayerCharacterAnimInstance.h"
+
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	
 
 	_SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	_SpringArmComponent->SetupAttachment(RootComponent);
@@ -29,6 +35,11 @@ APlayerCharacter::APlayerCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+
+	GrappleCable = CreateDefaultSubobject<UCableComponent>(TEXT("Grappling Line"));
+	GrappleCable->SetupAttachment(_CameraComponent);
+	GrappleCable->SetVisibility(false);
+
 }
 
 int APlayerCharacter::GetHealthPoints()
@@ -63,6 +74,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Error, TEXT("Capsule Component %s"), *this->RootComponent.GetFullName());
+
 }
 
 // Called every frame
@@ -73,33 +86,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
 
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	FVector Start = GetActorLocation() + FVector(0,0,50);
-	FVector End = Start + _CameraComponent->GetForwardVector() * 1000.f;
-
-	bool HitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params, FCollisionResponseParams());
-
-
-	if (HitSomething)
+	if (isGrappling)
 	{
-		if (HitResult.GetActor()->ActorHasTag("Grappleable"))
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "Slayy queen");
+		GrappleCable->EndLocation = GetActorTransform().InverseTransformPosition(GrapplePoint);
 
-			bCanGrapple = true;
-		}
-		UKismetSystemLibrary::DrawDebugLine(GetWorld(), Start, End, FColor(100, 0, 0));
-		UKismetSystemLibrary::DrawDebugSphere(GetWorld(), End, 5, 5, FLinearColor::White);
-	}
-	else
-	{
-		bCanGrapple = false;
-
-		UKismetSystemLibrary::DrawDebugLine(GetWorld(), Start, End, FColor(100, 0, 0));
-		UKismetSystemLibrary::DrawDebugSphere(GetWorld(), End, 5, 5, FLinearColor::White);
+		GetCharacterMovement()->AddForce(GrapplePoint - GetActorLocation().GetSafeNormal() * 100000);
 	}
 }
 
@@ -129,6 +120,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 
 		Input->BindAction(AttackAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Attack);
+
+		Input->BindAction(GrappleAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Grapple);
+		Input->BindAction(GrappleAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopGrapple);
 	}
 }
 
@@ -181,14 +175,58 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 
 void APlayerCharacter::Attack()
 {
-	if(bCanGrapple == true)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed input action");
-		
-		GetCapsuleComponent()->AddImpulse(GetActorForwardVector() * 500);
-	}
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed input action");
 
 	//UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	//animInst->State = EPlayerState::Attack;
 
+}
+
+void APlayerCharacter::Grapple()
+{
+	/* Old 
+	FVector Start = GetCapsuleComponent()->GetComponentLocation();
+	FVector End = Start + (MaxLineDistance * _CameraComponent->GetComponentRotation());
+	DrawDebugLine(GetWorld(), Start, End, FColor::Emerald);
+
+	FHitResult HitResult;
+	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, Start, End, 
+		FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(100.0f));
+
+	if (HasHit)
+	{
+		AGrappledActor* HitActor = Cast<AGrappledActor>(HitResult.GetActor());
+		if (HitActor != nullptr)
+		{
+			HitActor->OnActivate();
+		}
+
+	}
+	*/
+
+	FVector Start = GetCapsuleComponent()->GetComponentLocation();
+	FVector End = Start + (MaxLineDistance * UKismetMathLibrary::GetForwardVector(_CameraComponent->GetComponentRotation()));
+	DrawDebugLine(GetWorld(), Start, End, FColor::Emerald);
+
+	FHitResult HitResult;
+	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, Start, End,
+		FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(100.0f));
+	
+	if (HasHit)
+	{
+		isGrappling = true;
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+		GrappleCable->SetVisibility(true);
+		GrapplePoint = HitResult.ImpactPoint;
+	}
+}
+
+void APlayerCharacter::StopGrapple()
+{
+	isGrappling = false;
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+	}
+	GrappleCable->SetVisibility(false);
 }

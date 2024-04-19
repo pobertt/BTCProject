@@ -14,7 +14,6 @@ AGrappledActor::AGrappledActor()
 
 	_BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	_BoxComponent->SetupAttachment(_MeshComponent);
-	
 
 	this->Tags.Add(FName("Grappleable"));
 }
