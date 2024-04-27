@@ -121,6 +121,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		Input->BindAction(SprintAction, ETriggerEvent::Started, this, &APlayerCharacter::Sprint);
 		Input->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopSprint);
+
+		Input->BindAction(CrouchAction, ETriggerEvent::Started, this, &APlayerCharacter::Crouch);
+		Input->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopCrouch);
 	}
 }
 
@@ -238,4 +241,18 @@ void APlayerCharacter::Sprint()
 void APlayerCharacter::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+}
+
+void APlayerCharacter::Crouch()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed Crouch action");
+
+	ACharacter::Crouch();
+}
+
+void APlayerCharacter::StopCrouch()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Stop Crouch action");
+
+	ACharacter::UnCrouch();
 }

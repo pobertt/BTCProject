@@ -93,6 +93,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 		class UInputAction* SprintAction;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* CrouchAction;
+
+
 	/* FInputActionValue to find out which button we are pressing*/
 
 	void Move(const FInputActionValue& InputValue);
@@ -112,6 +116,10 @@ protected:
 	void Sprint();
 
 	void StopSprint();
+
+	void Crouch();
+
+	void StopCrouch();
 
 private:
 
