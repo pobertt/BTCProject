@@ -118,6 +118,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		Input->BindAction(GrappleAction, ETriggerEvent::Started, this, &APlayerCharacter::Grapple);
 		Input->BindAction(GrappleAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopGrapple);
+
+		Input->BindAction(SprintAction, ETriggerEvent::Started, this, &APlayerCharacter::Sprint);
+		Input->BindAction(SprintAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopSprint);
 	}
 }
 
@@ -223,4 +226,16 @@ void APlayerCharacter::StopGrapple()
 	}
 	GrappleCable->SetVisibility(false);
 	bCanGrapple = true;
+}
+
+void APlayerCharacter::Sprint()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed Sprint action");
+
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+}
+
+void APlayerCharacter::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }

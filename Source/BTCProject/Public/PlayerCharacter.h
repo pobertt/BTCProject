@@ -90,6 +90,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grappling", meta = (AllowPrivateAccess = "true"))
 		class UCableComponent* GrappleCable;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* SprintAction;
+
 	/* FInputActionValue to find out which button we are pressing*/
 
 	void Move(const FInputActionValue& InputValue);
@@ -105,6 +108,10 @@ protected:
 	void Grapple();
 
 	void StopGrapple();
+
+	void Sprint();
+
+	void StopSprint();
 
 private:
 
