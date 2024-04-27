@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "DrawDebugHelpers.h"
 #include "PlayerCharacterAnimInstance.h"
 
 
@@ -86,6 +87,25 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
+
+	//Remove out of event tick
+
+	FCollisionObjectQueryParams ObjectParams;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	FVector Start = GetActorLocation();
+	FVector End = GetActorLocation();
+
+	FHitResult HitResult;
+
+	//88 34 Capsule Half Height and Radius can be adjusted to make wall sliding smoother
+
+	if (GetCharacterMovement()->IsFalling())
+	{
+		UKismetSystemLibrary::CapsuleTraceMultiForObjects(HitResult, Start, End, 35.0f, 89.0f, , true, )
+
+	}
 }
 
 // Called to bind functionality to input
@@ -158,9 +178,25 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 
 void APlayerCharacter::Jump()
 {
-	ACharacter::Jump();
+	if (ACharacter::JumpCurrentCount < ACharacter::JumpMaxCount)
+	{
+		if (GetCharacterMovement()->IsFalling())
+		{
+			//Animation Montage for double jump
+			//https://www.youtube.com/watch?v=_flv0-uYD60&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=6
 
-	//Add jumping animation here
+			ACharacter::Jump();
+
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Double Jump");
+
+		}
+		else
+		{
+			ACharacter::Jump();
+
+			//Add jumping animation here
+		}
+	}
 }
 
 void APlayerCharacter::StopJump()
