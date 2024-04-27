@@ -146,6 +146,8 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 
 		AddMovementInput(ForwardDirection, InputVector.Y);
 		AddMovementInput(RightDirection, InputVector.X);
+
+		//https://www.youtube.com/watch?v=S6zCkFA9cDY&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=3 16 mins in to make WASD movement smoother
 	}
 }
 
