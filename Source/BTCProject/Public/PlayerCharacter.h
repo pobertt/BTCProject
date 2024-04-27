@@ -96,6 +96,8 @@ protected:
 
 	void Jump();
 
+	void StopJump();
+
 	void Look(const FInputActionValue& InputValue);	
 
 	void Attack();

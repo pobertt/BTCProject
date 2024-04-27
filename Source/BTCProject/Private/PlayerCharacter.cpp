@@ -109,7 +109,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	{
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Move);
 
-		Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Jump);
+		Input->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacter::Jump);
+		Input->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopJump);
 
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 
@@ -146,8 +147,6 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 
 		AddMovementInput(ForwardDirection, InputVector.Y);
 		AddMovementInput(RightDirection, InputVector.X);
-
-		//https://www.youtube.com/watch?v=S6zCkFA9cDY&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=3 16 mins in to make WASD movement smoother
 	}
 }
 
@@ -156,6 +155,11 @@ void APlayerCharacter::Jump()
 	ACharacter::Jump();
 
 	//Add jumping animation here
+}
+
+void APlayerCharacter::StopJump()
+{
+	ACharacter::StopJumping();
 }
 
 void APlayerCharacter::Look(const FInputActionValue& InputValue)
