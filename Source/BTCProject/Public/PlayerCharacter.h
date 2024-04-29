@@ -40,6 +40,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
 		bool bCanGrapple = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		int JumpCount;
+
+	UPROPERTY(EditAnywhere, Category = "Jumping Params")
+		bool bInWallSlide;
+
+	UPROPERTY(EditAnywhere, Category = "Jumping Params")
+		float DefaultGravity;
+
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter", meta = (DisplayName = "Get HP"))
 		int GetHealthPoints();
 

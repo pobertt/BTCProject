@@ -90,8 +90,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	//Remove out of event tick
 
-	bool bInWallSlide;
-
 	TArray< TEnumAsByte< EObjectTypeQuery > > Actors;
 	Actors.Add(EObjectTypeQuery::ObjectTypeQuery1);
 
@@ -131,20 +129,24 @@ void APlayerCharacter::Tick(float DeltaTime)
 				GetCharacterMovement()->GravityScale = 0.1;
 
 				//Goes off to the left for some reason
+				//How to set X and Y velocity to 0???
 
 				GetCharacterMovement()->Velocity = UKismetMathLibrary::VInterpTo(
 					APlayerCharacter::GetVelocity(), 
 					UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z), 
 					DeltaTime, 
-					4);
+					8);
+
+					//Last value is Wall Slide Deceleration
 
 				SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
 			}
+
 			//Wall Slide animation
 		}
 		else
 		{
-			GetCharacterMovement()->GravityScale = 1;
+			GetCharacterMovement()->GravityScale = DefaultGravity;
 
 			bInWallSlide = false;
 
@@ -225,21 +227,44 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 
 void APlayerCharacter::Jump()
 {
-	if (ACharacter::JumpCurrentCount < ACharacter::JumpMaxCount)
+	float AirJumpForce = 600;
+
+	float WallJumpForce = -500;
+
+	if (JumpCount < ACharacter::JumpMaxCount)
 	{
 		if (GetCharacterMovement()->IsFalling())
 		{
-			//Animation Montage for double jump
+			if (bInWallSlide)
+			{
+				//How to set X and Y velocity to 0???
+
+				FVector result = GetActorForwardVector() * WallJumpForce;
+
+				ACharacter::LaunchCharacter(result + UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+
+			}
+			else
+			{
+				//Animation Montage for double jump
 			//https://www.youtube.com/watch?v=_flv0-uYD60&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=6
 
-			ACharacter::Jump();
+				//ACharacter::Jump();
 
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Double Jump");
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Double Jump");
 
+				//How to set X and Y velocity to 0???
+
+				ACharacter::LaunchCharacter(UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+
+				JumpCount++;
+			}
 		}
 		else
 		{
 			ACharacter::Jump();
+
+			JumpCount++;
 
 			//Add jumping animation here
 		}
@@ -249,6 +274,8 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::StopJump()
 {
 	ACharacter::StopJumping();
+
+
 }
 
 void APlayerCharacter::Look(const FInputActionValue& InputValue)
