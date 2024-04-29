@@ -146,5 +146,4 @@ public:
 	{
 		return _CameraComponent;
 	}
-
 };

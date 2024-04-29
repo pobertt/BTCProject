@@ -90,6 +90,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	//Remove out of event tick
 
+	bool bInWallSlide;
+
+	TArray< TEnumAsByte< EObjectTypeQuery > > Actors;
+	Actors.Add(EObjectTypeQuery::ObjectTypeQuery1);
+
+	TArray<AActor*, FDefaultAllocator> IgnoreActors;
+
 	FCollisionObjectQueryParams ObjectParams;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
@@ -97,14 +104,54 @@ void APlayerCharacter::Tick(float DeltaTime)
 	FVector Start = GetActorLocation();
 	FVector End = GetActorLocation();
 
-	FHitResult HitResult;
-
-	//88 34 Capsule Half Height and Radius can be adjusted to make wall sliding smoother
+	TArray<FHitResult> HitResult;
 
 	if (GetCharacterMovement()->IsFalling())
 	{
-		UKismetSystemLibrary::CapsuleTraceMultiForObjects(HitResult, Start, End, 35.0f, 89.0f, , true, )
+		bool HasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects
+			(GetWorld(), AActor::GetActorLocation(), AActor::GetActorLocation(), 35.0f, 89.0f,
+			Actors, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, 
+			HitResult, true, FLinearColor::Red, FLinearColor::Green, 5.0f);
 
+		if (HasHit)
+		{
+			bInWallSlide = true;
+
+			if (GetCharacterMovement()->Velocity.Z <= 0) 
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Has Hit");
+				
+				if (bInWallSlide == true)
+				{
+					GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
+
+					GetCharacterMovement()->Velocity.Y = APlayerCharacter::GetVelocity().Y;
+				}
+
+				GetCharacterMovement()->GravityScale = 0.1;
+
+				//Goes off to the left for some reason
+
+				GetCharacterMovement()->Velocity = UKismetMathLibrary::VInterpTo(
+					APlayerCharacter::GetVelocity(), 
+					UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z), 
+					DeltaTime, 
+					4);
+
+				SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
+			}
+			//Wall Slide animation
+		}
+		else
+		{
+			GetCharacterMovement()->GravityScale = 1;
+
+			bInWallSlide = false;
+
+			GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
+
+			GetCharacterMovement()->Velocity.Y = APlayerCharacter::GetVelocity().Y;
+		}
 	}
 }
 
