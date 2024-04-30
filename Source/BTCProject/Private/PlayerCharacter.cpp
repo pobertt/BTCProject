@@ -84,77 +84,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
 	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
 
 	//Remove out of event tick
 
-	TArray< TEnumAsByte< EObjectTypeQuery > > Actors;
-	Actors.Add(EObjectTypeQuery::ObjectTypeQuery1);
-
-	TArray<AActor*, FDefaultAllocator> IgnoreActors;
-
-	FCollisionObjectQueryParams ObjectParams;
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
-
-	FVector Start = GetActorLocation();
-	FVector End = GetActorLocation();
-
-	TArray<FHitResult> HitResult;
-
-	if (GetCharacterMovement()->IsFalling())
-	{
-		bool HasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects
-			(GetWorld(), AActor::GetActorLocation(), AActor::GetActorLocation(), 35.0f, 89.0f,
-			Actors, false, IgnoreActors, EDrawDebugTrace::ForOneFrame, 
-			HitResult, true, FLinearColor::Red, FLinearColor::Green, 5.0f);
-
-		if (HasHit)
-		{
-			bInWallSlide = true;
-
-			if (GetCharacterMovement()->Velocity.Z <= 0) 
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Has Hit");
-				
-				if (bInWallSlide == true)
-				{
-					GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
-
-					GetCharacterMovement()->Velocity.Y = APlayerCharacter::GetVelocity().Y;
-				}
-
-				GetCharacterMovement()->GravityScale = 0.1;
-
-				//Goes off to the left for some reason
-				//How to set X and Y velocity to 0???
-
-				GetCharacterMovement()->Velocity = UKismetMathLibrary::VInterpTo(
-					APlayerCharacter::GetVelocity(), 
-					UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z), 
-					DeltaTime, 
-					8);
-
-					//Last value is Wall Slide Deceleration
-
-				SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
-			}
-
-			//Wall Slide animation
-		}
-		else
-		{
-			GetCharacterMovement()->GravityScale = DefaultGravity;
-
-			bInWallSlide = false;
-
-			GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
-
-			GetCharacterMovement()->Velocity.Y = APlayerCharacter::GetVelocity().Y;
-		}
-	}
+	WallSlide();
 }
 
 // Called to bind functionality to input
@@ -222,12 +157,14 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 
 		AddMovementInput(ForwardDirection, InputVector.Y);
 		AddMovementInput(RightDirection, InputVector.X);
+
+		
 	}
 }
 
 void APlayerCharacter::Jump()
 {
-	float AirJumpForce = 600;
+	float AirJumpForce = 600.f;
 
 	float WallJumpForce = -500;
 
@@ -241,7 +178,9 @@ void APlayerCharacter::Jump()
 
 				FVector result = GetActorForwardVector() * WallJumpForce;
 
-				ACharacter::LaunchCharacter(result + UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+				ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X + WallJumpForce, 
+					GetMovementComponent()->Velocity.Y + WallJumpForce, 
+					GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
 
 			}
 			else
@@ -255,7 +194,12 @@ void APlayerCharacter::Jump()
 
 				//How to set X and Y velocity to 0???
 
-				ACharacter::LaunchCharacter(UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+				// ACharacter::LaunchCharacter(UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), false, true);
+				// ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X,GetMovementComponent()->Velocity.Y, AirJumpForce), true, true);
+				// ACharacter::LaunchCharacter(FVector(LaunchDirection.X*AirJumpForce,LaunchDirection.Y*AirJumpForce, AirJumpForce), true, true);
+
+				ACharacter::Jump();
+
 
 				JumpCount++;
 			}
@@ -286,6 +230,8 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 	{
 		AddControllerYawInput(InputVector.X);
 		AddControllerPitchInput(InputVector.Y);
+
+		LaunchDirection = FVector2D(InputVector.X, InputVector.Y);
 	}
 }
 
@@ -305,9 +251,11 @@ void APlayerCharacter::Grapple()
 
 	FVector Start = (GetActorForwardVector() * 50.f) + GetCapsuleComponent()->GetComponentLocation();
 	FVector End = Start + (MaxLineDistance * UKismetMathLibrary::GetForwardVector(_CameraComponent->GetComponentRotation()));
+
 	DrawDebugLine(GetWorld(), Start, End, FColor::Emerald);
 
 	FHitResult HitResult;
+
 	bool HasHit = GetWorld()->SweepSingleByChannel(HitResult, Start, End,
 		FQuat::Identity, ECC_GameTraceChannel2, FCollisionShape::MakeSphere(1.0f), Params);
 	
@@ -365,4 +313,75 @@ void APlayerCharacter::StopCrouch()
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Stop Crouch action");
 
 	ACharacter::UnCrouch();
+}
+
+void APlayerCharacter::WallSlide()
+{
+	float Time = GetWorld()->GetDeltaSeconds();
+
+	TArray< TEnumAsByte< EObjectTypeQuery > > Actors;
+	Actors.Add(EObjectTypeQuery::ObjectTypeQuery1);
+
+	TArray<AActor*, FDefaultAllocator> IgnoreActors;
+
+	FCollisionObjectQueryParams ObjectParams;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	FVector Start = GetActorLocation();
+	FVector End = GetActorLocation();
+
+	TArray<FHitResult> HitResult;
+
+	if (GetCharacterMovement()->IsFalling())
+	{
+		bool HasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects
+		(GetWorld(), AActor::GetActorLocation(), AActor::GetActorLocation(), 39.0f, 94.0f,
+			Actors, false, IgnoreActors, EDrawDebugTrace::ForOneFrame,
+			HitResult, true, FLinearColor::Red, FLinearColor::Green, 5.0f);
+
+		if (HasHit)
+		{
+			bInWallSlide = true;
+
+			if (GetCharacterMovement()->Velocity.Z <= 0)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Has Hit");
+
+				if (bInWallSlide == true)
+				{
+					GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
+
+					GetCharacterMovement()->Velocity.Y = APlayerCharacter::GetVelocity().Y;
+				}
+
+				GetCharacterMovement()->GravityScale = 0.1;
+
+				//Goes off to the left for some reason
+				//How to set X and Y velocity to 0???
+
+				GetCharacterMovement()->Velocity = UKismetMathLibrary::VInterpTo(
+					APlayerCharacter::GetVelocity(),
+					FVector(0.0,0.0,GetMovementComponent()->Velocity.Z),
+					Time,
+					8);
+
+				//Last value is Wall Slide Deceleration
+
+				SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
+			}
+
+			//Wall Slide animation
+		}
+		else
+		{
+			GetCharacterMovement()->GravityScale = DefaultGravity;
+
+			bInWallSlide = false;
+
+			GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
+
+			GetCharacterMovement()->Velocity.Y = APlayerCharacter::GetVelocity().Y;
+		}
+	}
 }

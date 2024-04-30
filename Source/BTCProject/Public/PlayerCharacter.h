@@ -76,6 +76,8 @@ protected:
 
 	void DieProcess();
 
+	FVector2D LaunchDirection;
+
 	/* References to Input Mapping / Action */
 
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -129,6 +131,8 @@ protected:
 	void Crouch();
 
 	void StopCrouch();
+
+	void WallSlide();
 
 private:
 
