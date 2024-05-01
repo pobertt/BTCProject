@@ -166,10 +166,6 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 
 void APlayerCharacter::Jump()
 {
-	float AirJumpForce = 1000.f;
-
-	float WallJumpForce = -500;
-
 	if (bInWallSlide)
 	{
 
@@ -186,16 +182,14 @@ void APlayerCharacter::Jump()
 		{
 			if (GetCharacterMovement()->IsFalling())
 			{
-
 				//Animation Montage for double jump
 				//https://www.youtube.com/watch?v=_flv0-uYD60&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=6
 
 				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Double Jump");
 
-				//How to set X and Y velocity to 0???
+				FVector ResetVelocity(ACharacter::GetVelocity().X, ACharacter::GetVelocity().Y, 0.0);
 
-				// ACharacter::LaunchCharacter(UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), false, true);
-				// ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X,GetMovementComponent()->Velocity.Y, AirJumpForce), true, true);
+				GetCharacterMovement()->Velocity = ResetVelocity;
 
 				ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X, GetMovementComponent()->Velocity.Y, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
 

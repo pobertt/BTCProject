@@ -19,25 +19,25 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Params")
 		int HealthPoints = 500;
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Params")
 		float Strength = 10;
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Params")
 		float Armour = 3;
 
-	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
 		float AttackRange = 6.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
 		float AttackInterval = 1.2f;
 
-	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
 		bool bCanAttack = true;
 
-	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
 		bool bCanGrapple = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
@@ -46,8 +46,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
 		bool bInWallSlide;
 
-	UPROPERTY(EditAnywhere, Category = "Jumping Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
 		float DefaultGravity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		float AirJumpForce = 1200.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		float WallJumpForce = -500.0f;
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter", meta = (DisplayName = "Get HP"))
 		int GetHealthPoints();
