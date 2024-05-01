@@ -403,3 +403,11 @@ void APlayerCharacter::WallSlide()
 		}
 	}
 }
+
+
+/*
+	Bug:Because of SetActorRotation being constantly called from event tick- 
+		when trying to wall jump it will send the player upwards IF by chance the player is facing into the wall
+		Need to make the the SetActorRotation only happen once
+		Maybe only do that in bp?
+*/
