@@ -170,22 +170,23 @@ void APlayerCharacter::Jump()
 
 	float WallJumpForce = -500;
 
-	if (JumpCount < ACharacter::JumpMaxCount)
+	if (bInWallSlide)
 	{
-		if (GetCharacterMovement()->IsFalling())
+
+		double Xresult = GetActorForwardVector().X * WallJumpForce;
+
+		double Yresult = GetActorForwardVector().Y * WallJumpForce;
+
+		ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+
+	}
+	else
+	{
+		if (JumpCount < ACharacter::JumpMaxCount)
 		{
-			if (bInWallSlide)
+			if (GetCharacterMovement()->IsFalling())
 			{
 
-				double Xresult = GetActorForwardVector().X * WallJumpForce;
-
-				double Yresult = GetActorForwardVector().Y * WallJumpForce;
-
-				ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
-
-			}
-			else
-			{
 				//Animation Montage for double jump
 				//https://www.youtube.com/watch?v=_flv0-uYD60&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=6
 
@@ -195,19 +196,19 @@ void APlayerCharacter::Jump()
 
 				// ACharacter::LaunchCharacter(UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), false, true);
 				// ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X,GetMovementComponent()->Velocity.Y, AirJumpForce), true, true);
-				
+
 				ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X, GetMovementComponent()->Velocity.Y, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
 
 				JumpCount++;
 			}
-		}
-		else
-		{
-			ACharacter::Jump();
+			else
+			{
+				ACharacter::Jump();
 
-			JumpCount++;
+				JumpCount++;
 
-			//Add jumping animation here
+				//Add jumping animation here
+			}
 		}
 	}
 }
@@ -337,8 +338,6 @@ void APlayerCharacter::WallSlide()
 
 		if (HasHit)
 		{
-			JumpCount = ACharacter::JumpMaxCount - 1;
-
 			bInWallSlide = true;
 
 			if (GetCharacterMovement()->Velocity.Z <= 0)
@@ -347,6 +346,8 @@ void APlayerCharacter::WallSlide()
 
 				if (bInWallSlide == true)
 				{
+					JumpCount = ACharacter::JumpMaxCount - 1;
+
 					GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
 
 					GetCharacterMovement()->Velocity.Y = APlayerCharacter::GetVelocity().Y;
