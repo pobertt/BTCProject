@@ -41,6 +41,7 @@ APlayerCharacter::APlayerCharacter()
 	GrappleCable->SetupAttachment(_CameraComponent);
 	GrappleCable->SetVisibility(false);
 
+	
 }
 
 int APlayerCharacter::GetHealthPoints()
@@ -238,6 +239,7 @@ void APlayerCharacter::Attack()
 
 void APlayerCharacter::Grapple()
 {
+	/*
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 
@@ -268,6 +270,27 @@ void APlayerCharacter::Grapple()
 			GetCharacterMovement()->AddImpulse((GrapplePoint - GetActorLocation()).GetSafeNormal() * 10000);
 		}
 	}
+	*/
+
+	/*
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	FVector Start = (GetCameraComponent()->GetComponentLocation());
+
+	//float is distance we want to grab
+
+	FVector End = (GetCameraComponent()->GetForwardVector() * 3000.0f);
+
+	FHitResult HitResult;
+
+	bool HasHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, Start + End, ECC_WorldDynamic, Params);
+
+	if (HasHit)
+	{
+		
+	}
+	*/
 }
 
 void APlayerCharacter::StopGrapple()
@@ -309,6 +332,7 @@ void APlayerCharacter::StopCrouch()
 
 void APlayerCharacter::WallSlide()
 {
+
 	float Time = GetWorld()->GetDeltaSeconds();
 
 	TArray< TEnumAsByte< EObjectTypeQuery > > Actors;
@@ -342,6 +366,8 @@ void APlayerCharacter::WallSlide()
 
 				if (bInWallSlide == true)
 				{
+					
+
 					JumpCount = ACharacter::JumpMaxCount - 1;
 
 					GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
@@ -351,9 +377,6 @@ void APlayerCharacter::WallSlide()
 
 				GetCharacterMovement()->GravityScale = 0.1;
 
-				//Goes off to the left for some reason
-				//How to set X and Y velocity to 0???
-
 				GetCharacterMovement()->Velocity = UKismetMathLibrary::VInterpTo(
 					APlayerCharacter::GetVelocity(),
 					FVector(0.0,0.0,GetActorForwardVector().Z - 50),
@@ -361,9 +384,10 @@ void APlayerCharacter::WallSlide()
 					8);
 
 				//Last value is Wall Slide Deceleration
-
-				SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
 			}
+
+			//Do Once
+			SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
 
 			//Wall Slide animation
 		}
