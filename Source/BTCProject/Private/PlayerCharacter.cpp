@@ -162,6 +162,8 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 	}
 }
 
+//Character Velocity + 
+
 void APlayerCharacter::Jump()
 {
 	float AirJumpForce = 600.f;
@@ -174,21 +176,18 @@ void APlayerCharacter::Jump()
 		{
 			if (bInWallSlide)
 			{
-				//How to set X and Y velocity to 0???
 
-				FVector result = GetActorForwardVector() * WallJumpForce;
+				double Xresult = GetActorForwardVector().X * WallJumpForce;
 
-				ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X + WallJumpForce, 
-					GetMovementComponent()->Velocity.Y + WallJumpForce, 
-					GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+				double Yresult = GetActorForwardVector().Y * WallJumpForce;
+
+				ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
 
 			}
 			else
 			{
 				//Animation Montage for double jump
-			//https://www.youtube.com/watch?v=_flv0-uYD60&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=6
-
-				//ACharacter::Jump();
+				//https://www.youtube.com/watch?v=_flv0-uYD60&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=6
 
 				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Double Jump");
 
@@ -196,10 +195,8 @@ void APlayerCharacter::Jump()
 
 				// ACharacter::LaunchCharacter(UKismetMathLibrary::Conv_DoubleToVector(GetMovementComponent()->Velocity.Z + AirJumpForce), false, true);
 				// ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X,GetMovementComponent()->Velocity.Y, AirJumpForce), true, true);
-				// ACharacter::LaunchCharacter(FVector(LaunchDirection.X*AirJumpForce,LaunchDirection.Y*AirJumpForce, AirJumpForce), true, true);
-
-				ACharacter::Jump();
-
+				
+				ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X, GetMovementComponent()->Velocity.Y, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
 
 				JumpCount++;
 			}
@@ -218,8 +215,6 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::StopJump()
 {
 	ACharacter::StopJumping();
-
-
 }
 
 void APlayerCharacter::Look(const FInputActionValue& InputValue)
@@ -342,6 +337,8 @@ void APlayerCharacter::WallSlide()
 
 		if (HasHit)
 		{
+			JumpCount = ACharacter::JumpMaxCount - 1;
+
 			bInWallSlide = true;
 
 			if (GetCharacterMovement()->Velocity.Z <= 0)
