@@ -173,7 +173,9 @@ void APlayerCharacter::Jump()
 
 		double Yresult = GetActorForwardVector().Y * WallJumpForce;
 
-		ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+		float WallJumpVerticalForce = 1000.0f;
+
+		ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + WallJumpVerticalForce), true, true);
 
 	}
 	else
