@@ -43,7 +43,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
 		int JumpCount;
 
-	UPROPERTY(EditAnywhere, Category = "Jumping Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
 		bool bInWallSlide;
 
 	UPROPERTY(EditAnywhere, Category = "Jumping Params")

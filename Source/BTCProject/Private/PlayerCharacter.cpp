@@ -166,7 +166,7 @@ void APlayerCharacter::Move(const FInputActionValue& InputValue)
 
 void APlayerCharacter::Jump()
 {
-	float AirJumpForce = 600.f;
+	float AirJumpForce = 1000.f;
 
 	float WallJumpForce = -500;
 
@@ -331,7 +331,7 @@ void APlayerCharacter::WallSlide()
 	if (GetCharacterMovement()->IsFalling())
 	{
 		bool HasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects
-		(GetWorld(), AActor::GetActorLocation(), AActor::GetActorLocation(), 39.0f, 94.0f,
+		(GetWorld(), AActor::GetActorLocation(), AActor::GetActorLocation(), 35.0f, 89.0f,
 			Actors, false, IgnoreActors, EDrawDebugTrace::ForOneFrame,
 			HitResult, true, FLinearColor::Red, FLinearColor::Green, 5.0f);
 
@@ -359,7 +359,7 @@ void APlayerCharacter::WallSlide()
 
 				GetCharacterMovement()->Velocity = UKismetMathLibrary::VInterpTo(
 					APlayerCharacter::GetVelocity(),
-					FVector(0.0,0.0,GetMovementComponent()->Velocity.Z),
+					FVector(0.0,0.0,GetActorForwardVector().Z - 50),
 					Time,
 					8);
 
