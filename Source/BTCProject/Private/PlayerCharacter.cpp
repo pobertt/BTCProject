@@ -169,7 +169,6 @@ void APlayerCharacter::Jump()
 {
 	if (bInWallSlide)
 	{
-
 		double Xresult = GetActorForwardVector().X * WallJumpForce;
 
 		double Yresult = GetActorForwardVector().Y * WallJumpForce;
@@ -366,8 +365,6 @@ void APlayerCharacter::WallSlide()
 
 				if (bInWallSlide == true)
 				{
-					
-
 					JumpCount = ACharacter::JumpMaxCount - 1;
 
 					GetCharacterMovement()->Velocity.X = APlayerCharacter::GetVelocity().X;
@@ -385,11 +382,19 @@ void APlayerCharacter::WallSlide()
 
 				//Last value is Wall Slide Deceleration
 			}
-
 			//Do Once
-			SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
+			if (HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw < 200)
+			{
 
-			//Wall Slide animation
+				SetActorRotation(FRotator(0, HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw - 90, 0));
+			}
+			else {
+
+				SetActorRotation(FRotator(0, HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw - 180, 0));
+			}
+			
+
+			//Wall Slide animation	
 		}
 		else
 		{
