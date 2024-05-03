@@ -85,8 +85,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
+	//UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	//animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
 
 	//Remove out of event tick
 
@@ -307,12 +307,12 @@ void APlayerCharacter::Sprint()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed Sprint action");
 
-	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 1.5 * 600.0f;
 }
 
 void APlayerCharacter::StopSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 }
 
 void APlayerCharacter::Crouch()
