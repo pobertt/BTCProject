@@ -37,10 +37,11 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 
+	/*
 	GrappleCable = CreateDefaultSubobject<UCableComponent>(TEXT("Grappling Line"));
 	GrappleCable->SetupAttachment(_CameraComponent);
 	GrappleCable->SetVisibility(false);
-
+	*/
 	
 }
 
