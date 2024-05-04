@@ -175,6 +175,8 @@ void APlayerCharacter::Jump()
 
 		float WallJumpVerticalForce = 1000.0f;
 
+		SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
+
 		ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + WallJumpVerticalForce), true, true);
 
 	}
@@ -382,18 +384,6 @@ void APlayerCharacter::WallSlide()
 
 				//Last value is Wall Slide Deceleration
 			}
-			//Do Once
-			if (HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw < 200)
-			{
-
-				SetActorRotation(FRotator(0, HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw - 90, 0));
-			}
-			else {
-
-				SetActorRotation(FRotator(0, HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw - 180, 0));
-			}
-			
-
 			//Wall Slide animation	
 		}
 		else
