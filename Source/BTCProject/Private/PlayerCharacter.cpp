@@ -297,6 +297,7 @@ void APlayerCharacter::Grapple()
 
 void APlayerCharacter::StopGrapple()
 {
+	/*
 	isGrappling = false;
 	if (!GetCharacterMovement()->IsFalling())
 	{
@@ -304,6 +305,7 @@ void APlayerCharacter::StopGrapple()
 	}
 	GrappleCable->SetVisibility(false);
 	bCanGrapple = true;
+	*/
 }
 
 void APlayerCharacter::Sprint()
