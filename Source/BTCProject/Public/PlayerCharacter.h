@@ -55,6 +55,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
 		float WallJumpForce = -500.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+		class UCameraComponent* _CameraComponent;
+
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter", meta = (DisplayName = "Get HP"))
 		int GetHealthPoints();
 
@@ -141,9 +144,6 @@ protected:
 	void WallSlide();
 
 private:
-
-	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* _CameraComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* _SpringArmComponent;

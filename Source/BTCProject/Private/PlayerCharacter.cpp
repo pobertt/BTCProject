@@ -37,10 +37,11 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 
+	/*
 	GrappleCable = CreateDefaultSubobject<UCableComponent>(TEXT("Grappling Line"));
 	GrappleCable->SetupAttachment(_CameraComponent);
 	GrappleCable->SetVisibility(false);
-
+	*/
 	
 }
 
@@ -85,8 +86,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-	animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
+	//UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	//animInst->Speed = GetCharacterMovement()->Velocity.Size2D();
 
 	//Remove out of event tick
 
@@ -174,6 +175,8 @@ void APlayerCharacter::Jump()
 		double Yresult = GetActorForwardVector().Y * WallJumpForce;
 
 		float WallJumpVerticalForce = 1000.0f;
+
+		SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
 
 		ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + WallJumpVerticalForce), true, true);
 
@@ -294,6 +297,7 @@ void APlayerCharacter::Grapple()
 
 void APlayerCharacter::StopGrapple()
 {
+	/*
 	isGrappling = false;
 	if (!GetCharacterMovement()->IsFalling())
 	{
@@ -301,18 +305,19 @@ void APlayerCharacter::StopGrapple()
 	}
 	GrappleCable->SetVisibility(false);
 	bCanGrapple = true;
+	*/
 }
 
 void APlayerCharacter::Sprint()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed Sprint action");
 
-	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 1.5 * 600.0f;
 }
 
 void APlayerCharacter::StopSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 }
 
 void APlayerCharacter::Crouch()
@@ -382,18 +387,6 @@ void APlayerCharacter::WallSlide()
 
 				//Last value is Wall Slide Deceleration
 			}
-			//Do Once
-			if (HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw < 200)
-			{
-
-				SetActorRotation(FRotator(0, HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw - 90, 0));
-			}
-			else {
-
-				SetActorRotation(FRotator(0, HitResult.GetData()->GetComponent()->GetForwardVector().Rotation().Yaw - 180, 0));
-			}
-			
-
 			//Wall Slide animation	
 		}
 		else
