@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "../../../Plugins/Runtime/CableComponent/Source/CableComponent/Classes/CableComponent.h"
+#include "GrappledActor.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -17,23 +19,44 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Params")
 		int HealthPoints = 500;
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Params")
 		float Strength = 10;
 
-	UPROPERTY(EditAnywhere, Category = "Player Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Params")
 		float Armour = 3;
 
-	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
 		float AttackRange = 6.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
 		float AttackInterval = 1.2f;
 
-	UPROPERTY(EditAnywhere, Category = "Player Attack Params")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
 		bool bCanAttack = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Attack Params")
+		bool bCanGrapple = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		int JumpCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		bool bInWallSlide;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		float DefaultGravity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		float AirJumpForce = 1200.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jumping Params")
+		float WallJumpForce = -500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+		class UCameraComponent* _CameraComponent;
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter", meta = (DisplayName = "Get HP"))
 		int GetHealthPoints();
@@ -62,6 +85,8 @@ protected:
 
 	void DieProcess();
 
+	FVector2D LaunchDirection;
+
 	/* References to Input Mapping / Action */
 
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -79,23 +104,55 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 		class UInputAction* AttackAction;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* GrappleAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grappling", meta = (AllowPrivateAccess = "true"))
+		class UCableComponent* GrappleCable;
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* SprintAction;
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+		class UInputAction* CrouchAction;
+
+
 	/* FInputActionValue to find out which button we are pressing*/
 
 	void Move(const FInputActionValue& InputValue);
 
 	void Jump();
 
+	void StopJump();
+
 	void Look(const FInputActionValue& InputValue);	
 
 	void Attack();
 
+	void Grapple();
+
+	void StopGrapple();
+
+	void Sprint();
+
+	void StopSprint();
+
+	void Crouch();
+
+	void StopCrouch();
+
+	void WallSlide();
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* _CameraComponent;
-
-	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* _SpringArmComponent;
+
+	float MaxLineDistance = 1600.0f;
+
+	bool isGrappling = false;
+
+	FVector GrapplePoint;
 
 public:
 
