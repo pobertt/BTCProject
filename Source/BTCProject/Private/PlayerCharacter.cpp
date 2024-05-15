@@ -170,13 +170,13 @@ void APlayerCharacter::Jump()
 {
 	if (bInWallSlide)
 	{
-		double Xresult = GetActorForwardVector().X * WallJumpForce;
-
-		double Yresult = GetActorForwardVector().Y * WallJumpForce;
-
 		float WallJumpVerticalForce = 1000.0f;
 
-		SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
+		double Xresult = GetActorForwardVector().X * WallJumpVerticalForce;
+
+		double Yresult = GetActorForwardVector().Y * WallJumpVerticalForce;
+
+		//SetActorRotation(GetActorRotation().Add(0, 180, 0), ETeleportType::None);
 
 		ACharacter::LaunchCharacter(FVector(Xresult, Yresult, GetMovementComponent()->Velocity.Z + WallJumpVerticalForce), true, true);
 
@@ -196,7 +196,7 @@ void APlayerCharacter::Jump()
 
 				GetCharacterMovement()->Velocity = ResetVelocity;
 
-				ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X, GetMovementComponent()->Velocity.Y, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
+				ACharacter::LaunchCharacter(FVector(GetMovementComponent()->Velocity.X , GetMovementComponent()->Velocity.Y, GetMovementComponent()->Velocity.Z + AirJumpForce), true, true);
 
 				JumpCount++;
 			}
