@@ -190,8 +190,6 @@ void APlayerCharacter::Jump()
 				//Animation Montage for double jump
 				//https://www.youtube.com/watch?v=_flv0-uYD60&list=PL9z3tc0RL6Z5Yi7-W8qxjrzTb6tHS_UAK&index=6
 
-				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Double Jump");
-
 				FVector ResetVelocity(ACharacter::GetVelocity().X, ACharacter::GetVelocity().Y, 0.0);
 
 				GetCharacterMovement()->Velocity = ResetVelocity;
@@ -232,8 +230,6 @@ void APlayerCharacter::Look(const FInputActionValue& InputValue)
 
 void APlayerCharacter::Attack()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed input action");
-
 	//UPlayerCharacterAnimInstance* animInst = animInst = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 	//animInst->State = EPlayerState::Attack;
 
@@ -310,8 +306,6 @@ void APlayerCharacter::StopGrapple()
 
 void APlayerCharacter::Sprint()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed Sprint action");
-
 	GetCharacterMovement()->MaxWalkSpeed = 1.5 * 600.0f;
 }
 
@@ -322,15 +316,11 @@ void APlayerCharacter::StopSprint()
 
 void APlayerCharacter::Crouch()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed Crouch action");
-
 	ACharacter::Crouch();
 }
 
 void APlayerCharacter::StopCrouch()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Stop Crouch action");
-
 	ACharacter::UnCrouch();
 }
 
@@ -357,7 +347,7 @@ void APlayerCharacter::WallSlide()
 	{
 		bool HasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects
 		(GetWorld(), AActor::GetActorLocation(), AActor::GetActorLocation(), 35.0f, 89.0f,
-			Actors, false, IgnoreActors, EDrawDebugTrace::ForOneFrame,
+			Actors, false, IgnoreActors, EDrawDebugTrace::None,
 			HitResult, true, FLinearColor::Red, FLinearColor::Green, 5.0f);
 
 		if (HasHit)
@@ -366,7 +356,6 @@ void APlayerCharacter::WallSlide()
 
 			if (GetCharacterMovement()->Velocity.Z <= 0)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "Has Hit");
 
 				if (bInWallSlide == true)
 				{
